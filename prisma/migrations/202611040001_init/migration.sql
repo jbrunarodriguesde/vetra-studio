@@ -1,0 +1,10 @@
+CREATE EXTENSION IF NOT EXISTS btree_gist;
+CREATE TABLE "User" (id SERIAL PRIMARY KEY,email TEXT UNIQUE NOT NULL,name TEXT NOT NULL,password TEXT NOT NULL,role TEXT NOT NULL DEFAULT 'CLIENT');
+CREATE TABLE "Professional" (id SERIAL PRIMARY KEY,"userId" INTEGER UNIQUE NOT NULL REFERENCES "User"(id));
+CREATE TABLE "Service" (id SERIAL PRIMARY KEY,name TEXT NOT NULL,duration INTEGER NOT NULL CHECK(duration>0),buffer INTEGER NOT NULL DEFAULT 15 CHECK(buffer>=0),price INTEGER NOT NULL CHECK(price>=0),active BOOLEAN NOT NULL DEFAULT true);
+CREATE TABLE "ProfessionalService" ("professionalId" INTEGER REFERENCES "Professional"(id),"serviceId" INTEGER REFERENCES "Service"(id),PRIMARY KEY("professionalId","serviceId"));
+CREATE TABLE "WorkingHours" (id SERIAL PRIMARY KEY,"professionalId" INTEGER NOT NULL REFERENCES "Professional"(id),weekday INTEGER NOT NULL CHECK(weekday BETWEEN 0 AND 6),"startMinute" INTEGER NOT NULL,"endMinute" INTEGER NOT NULL,CHECK("startMinute">=0 AND "endMinute"<=1440 AND "endMinute">"startMinute"));
+CREATE TABLE "TimeOff" (id SERIAL PRIMARY KEY,"professionalId" INTEGER NOT NULL REFERENCES "Professional"(id),start TIMESTAMPTZ NOT NULL,"end" TIMESTAMPTZ NOT NULL,reason TEXT NOT NULL,CHECK("end">start));
+CREATE TABLE "Appointment" (id SERIAL PRIMARY KEY,"userId" INTEGER NOT NULL REFERENCES "User"(id),"professionalId" INTEGER NOT NULL REFERENCES "Professional"(id),"serviceId" INTEGER NOT NULL REFERENCES "Service"(id),start TIMESTAMPTZ NOT NULL,"end" TIMESTAMPTZ NOT NULL,"busyEnd" TIMESTAMPTZ NOT NULL,price INTEGER NOT NULL,status TEXT NOT NULL DEFAULT 'CONFIRMED' CHECK(status IN ('CONFIRMED','CANCELLED','COMPLETED','NO_SHOW')),"overrideReason" TEXT,CHECK("end">start AND "busyEnd">="end"),EXCLUDE USING gist ("professionalId" WITH =,tstzrange(start,"busyEnd",'[)') WITH &&) WHERE (status='CONFIRMED'));
+CREATE INDEX "Appointment_userId_start_idx" ON "Appointment"("userId",start);
+CREATE TABLE "Notification" (id SERIAL PRIMARY KEY,"userId" INTEGER NOT NULL REFERENCES "User"(id),message TEXT NOT NULL,"createdAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP);

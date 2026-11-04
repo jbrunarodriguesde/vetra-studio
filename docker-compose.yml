@@ -1,0 +1,11 @@
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: vetra
+      POSTGRES_PASSWORD: vetra
+      POSTGRES_DB: vetra
+    ports: ["5432:5432"]
+    volumes: ["vetra_data:/var/lib/postgresql/data"]
+volumes:
+  vetra_data:

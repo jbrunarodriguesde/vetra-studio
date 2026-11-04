@@ -1,0 +1,3 @@
+import Link from 'next/link';
+const names=['Ritual facial','Massagem relaxante','Corte & finalização','Design de sobrancelhas','Manicure natural','Ritual de bem-estar'];
+export default async function Service({params}:{params:Promise<{id:string}>}){const {id}=await params;return <main style={{padding:'12vh 10vw'}}><Link href="/">← Vetra Studio</Link><p>SEU MENU DE CUIDADOS</p><h1>{names[Number(id)-1]||'Serviço não encontrado'}</h1><p>Uma experiência de cuidado individual em um ambiente acolhedor. Consulte preço, duração e horários disponíveis antes de confirmar.</p><Link href="/">Explorar e agendar ↗</Link></main>}

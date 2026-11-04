@@ -1,0 +1,3 @@
+export const overlaps=(a:number,b:number,c:number,d:number)=>a<d&&c<b;
+export function canCancel(start:Date,now=new Date()){return start.getTime()-now.getTime()>=86400000}
+export function slotsFor(day:string,duration:number,buffer:number,hours:{startMinute:number,endMinute:number}[],busy:{start:Date,end:Date}[],now=new Date()){const midnight=new Date(day+'T00:00:00-03:00').getTime();const out:string[]=[];for(const h of hours)for(let m=h.startMinute;m+duration+buffer<=h.endMinute;m+=15){const s=midnight+m*60000,e=s+(duration+buffer)*60000;if(s>now.getTime()&&!busy.some(b=>overlaps(s,e,b.start.getTime(),b.end.getTime())))out.push(new Date(s).toISOString())}return [...new Set(out)].sort()}

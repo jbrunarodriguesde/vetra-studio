@@ -1,0 +1,82 @@
+generator client {
+ provider = "prisma-client-js"
+}
+datasource db {
+ provider = "postgresql"
+ url = env("DATABASE_URL")
+}
+model User {
+ id Int @id @default(autoincrement())
+ email String @unique
+ name String
+ password String
+ role String @default("CLIENT")
+ professional Professional?
+ appointments Appointment[]
+ notifications Notification[]
+}
+model Professional {
+ id Int @id @default(autoincrement())
+ userId Int @unique
+ user User @relation(fields:[userId],references:[id])
+ services ProfessionalService[]
+ hours WorkingHours[]
+ timeOff TimeOff[]
+ appointments Appointment[]
+}
+model Service {
+ id Int @id @default(autoincrement())
+ name String
+ duration Int
+ buffer Int @default(15)
+ price Int
+ active Boolean @default(true)
+ professionals ProfessionalService[]
+ appointments Appointment[]
+}
+model ProfessionalService {
+ professionalId Int
+ serviceId Int
+ professional Professional @relation(fields:[professionalId],references:[id])
+ service Service @relation(fields:[serviceId],references:[id])
+ @@id([professionalId,serviceId])
+}
+model WorkingHours {
+ id Int @id @default(autoincrement())
+ professionalId Int
+ professional Professional @relation(fields:[professionalId],references:[id])
+ weekday Int
+ startMinute Int
+ endMinute Int
+}
+model TimeOff {
+ id Int @id @default(autoincrement())
+ professionalId Int
+ professional Professional @relation(fields:[professionalId],references:[id])
+ start DateTime @db.Timestamptz
+ end DateTime @db.Timestamptz
+ reason String
+}
+model Appointment {
+ id Int @id @default(autoincrement())
+ userId Int
+ user User @relation(fields:[userId],references:[id])
+ professionalId Int
+ professional Professional @relation(fields:[professionalId],references:[id])
+ serviceId Int
+ service Service @relation(fields:[serviceId],references:[id])
+ start DateTime @db.Timestamptz
+ end DateTime @db.Timestamptz
+ busyEnd DateTime @db.Timestamptz
+ price Int
+ status String @default("CONFIRMED")
+ overrideReason String?
+ @@index([userId,start])
+}
+model Notification {
+ id Int @id @default(autoincrement())
+ userId Int
+ user User @relation(fields:[userId],references:[id])
+ message String
+ createdAt DateTime @default(now())
+}

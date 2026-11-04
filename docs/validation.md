@@ -1,0 +1,1 @@
+Vitest: 3 testes aprovados (prazo, sobreposição e cálculo de disponibilidade). Prisma Client gerado. PostgreSQL e Docker indisponíveis: testes integrados não executados. Revisão visual não executada. Auditoria npm registrada em dependency-audit.json; dependências têm alertas pendentes.
