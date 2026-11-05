@@ -10,7 +10,7 @@ export function available({date,time,serviceId,professionalId},bookings=[],now=D
  if(isNaN(day)||day.toISOString().slice(0,10)!==date||day.getUTCDay()===0)return false;
  const start=minutes(time),end=start+service.duration;
  if(start<540||end>1080||start%30!==0||Date.parse(date+'T'+time+':00-03:00')<=now)return false;
- const busy=[{start:720,end:780},{start:600,end:660},{start:870,end:930},...bookings.filter(item=>item.date===date&&item.professionalId===professionalId)];
+ const busy=[{start:720,end:780},{start:600,end:660},{start:870,end:930},...bookings.filter(item=>item.status!=='cancelled'&&item.date===date&&item.professionalId===professionalId)];
  return !busy.some(item=>start<item.end&&end>item.start);
 }
 
